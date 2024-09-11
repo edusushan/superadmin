@@ -8,6 +8,7 @@ import {
   OnGatewayDisconnect,
   MessageBody,
   ConnectedSocket,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
@@ -66,12 +67,36 @@ export class ChatGateway
 
   @SubscribeMessage('joinSupport')
   handleJoinChat(
-    @MessageBody() userId: string,
+    @MessageBody() data: string,
     @ConnectedSocket() client: Socket,
   ) {
-    client.join(userId);
+    const payload = JSON.parse(data);
+    this.validateRoomTypeAndParticipants(payload.participants, payload.userId);
+    console.log('Client Joined the chat');
+    client.join(payload.userId);
   }
 
+  private validateRoomTypeAndParticipants(
+    participants: string[],
+    userId: string,
+  ): void {
+    if (participants.includes(userId)) {
+      throw new WsException(
+        'The room owner or updater should not be included in the participants list.',
+      );
+    }
+
+    if (participants.length !== 1) {
+      throw new WsException(
+        'Direct chat must include exactly one participant aside from the room owner or updater.',
+      );
+    }
+
+    const uniqueParticipantIds = new Set(participants);
+    if (uniqueParticipantIds.size !== participants.length) {
+      throw new WsException('The participants list contains duplicates.');
+    }
+  }
   private authenticateSocket(socket: Socket): UserPayload {
     const token = this.extractJwtToken(socket);
 
