@@ -1,4 +1,12 @@
-import { Body, Controller, Headers, HttpCode, HttpStatus, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { Tokens } from './types';
@@ -15,7 +23,7 @@ export class AuthController {
   async signIn(
     @Body() dto: AuthDto,
     @Res({ passthrough: true }) response: Response,
-    @Headers('user-agent') userAgent: string,  // Extract User-Agent header
+    @Headers('user-agent') userAgent: string,
   ): Promise<Tokens> {
     // Pass the userAgent as deviceName to the AuthService
     const tokens = await this.authService.signIn(dto, userAgent, response);

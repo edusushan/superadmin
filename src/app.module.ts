@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { AtGuard, UserCheckGuard } from './common/guards';
 import { APP_GUARD } from '@nestjs/core';
 import { SchemaModule } from './schema/schema.module';
+import { ChatModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SchemaModule } from './schema/schema.module';
     SeederModule,
     AuthModule,
     SchemaModule,
+    ChatModule,
   ],
   providers: [
     {
